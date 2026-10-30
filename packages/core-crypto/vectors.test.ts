@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { canonicalizeJson } from "./canonical";
 import { holderPrivateKeyFromAppSeed, publicKeyOf, signPayload } from "./crypto";
 import {
-  Answer, CredentialOffer, PrimeRequest, TYP, certifyVerifier, createRequest, issueCredential, requestDigest, verifyAnswer,
+  Answer, CredentialOffer, PrimeRequest, buildAnswerSoftware, certifyVerifier, createRequest, issueCredential, verifyAnswer,
 } from "./protocol";
 
 const NOW = 1_793_000_000;
@@ -18,12 +18,8 @@ const ISSUER = "11".repeat(32);
 const VERIFIER = "22".repeat(32);
 const APP_SEED = "07".repeat(32);
 
-/** The device-side answer builder, reimplemented here only to produce the expected vector. */
-function buildAnswer(holderPriv: string, offer: CredentialOffer, req: PrimeRequest): Answer {
-  const disc = offer.disc.find((d) => d.k === req.claim)!;
-  const body = { typ: TYP.answer, cred: offer.cred, disc, req: requestDigest(req), nonce: req.nonce, aud: req.aud };
-  return { ...body, sig: signPayload(body, holderPriv) };
-}
+const buildAnswer = (holderPriv: string, offer: CredentialOffer, req: PrimeRequest): Answer =>
+  buildAnswerSoftware(holderPriv, offer.cred, offer.disc.find((d) => d.k === req.claim)!, req);
 
 const holderPriv = holderPrivateKeyFromAppSeed(APP_SEED);
 const holderPub = publicKeyOf(holderPriv);

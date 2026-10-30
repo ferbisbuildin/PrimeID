@@ -95,6 +95,15 @@ function unsigned<T extends { sig: string }>(item: T): Omit<T, "sig"> {
 
 export const toCanonicalJson = (item: unknown) => canonicalizeJson(item);
 
+/**
+ * Software holder: signs an answer the way Passport Prime does (build_answer in Rust).
+ * For test vectors and the Attack Lab only. A real answer is signed on the device.
+ */
+export function buildAnswerSoftware(holderPriv: string, cred: Credential, disc: Disclosure, req: PrimeRequest): Answer {
+  const body: Omit<Answer, "sig"> = { typ: TYP.answer, cred, disc, req: requestDigest(req), nonce: req.nonce, aud: req.aud };
+  return { ...body, sig: signPayload(body, holderPriv) };
+}
+
 export function requestDigest(req: PrimeRequest): string {
   return sha256Hex(canonicalizeJson(req));
 }

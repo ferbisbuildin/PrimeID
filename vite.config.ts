@@ -14,7 +14,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@core-crypto": path.resolve(__dirname, "./packages/core-crypto"),
-      "@keyos-app": path.resolve(__dirname, "./packages/keyos-incogid-app"),
       "lucide-react": path.resolve(__dirname, "./node_modules/lucide-react/dist/cjs/lucide-react.js"),
     },
   },

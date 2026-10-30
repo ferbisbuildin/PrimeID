@@ -16,9 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@core-crypto": ["packages/core-crypto/index.ts"],
-      "@core-crypto/*": ["packages/core-crypto/*"],
-      "@keyos-app": ["packages/keyos-incogid-app/index.ts"],
-      "@keyos-app/*": ["packages/keyos-incogid-app/*"]
+      "@core-crypto/*": ["packages/core-crypto/*"]
     }
   },
   "include": ["packages", "vite.config.ts", "*.d.ts"]

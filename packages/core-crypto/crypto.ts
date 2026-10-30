@@ -61,8 +61,7 @@ export function signPayload(payload: unknown, privHex: string): string {
 export function verifyPayload(payload: unknown, sigHex: unknown, pubHex: string): boolean {
   if (!isHex(sigHex, 64)) return false;
   try {
-    const sig = secp256k1.Signature.fromCompact(sigHex);
-    return secp256k1.verify(sig, digest(payload), parsePublicKey(pubHex), { lowS: true });
+    return secp256k1.verify(hexToBytes(sigHex), digest(payload), hexToBytes(parsePublicKey(pubHex)), { lowS: true, format: "compact" });
   } catch {
     return false;
   }
