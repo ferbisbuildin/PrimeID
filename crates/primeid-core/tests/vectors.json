@@ -1,0 +1,61 @@
+{
+  "now": 1793000000,
+  "app_seed": "0707070707070707070707070707070707070707070707070707070707070707",
+  "holder_pub": "033ddc48e59f6ecdcfb97cd01130f51ade234a03e9a250d47b20d4e5dbe0014714",
+  "offer": {
+    "typ": "primeid/offer/v1",
+    "cred": {
+      "typ": "primeid/credential/v1",
+      "id": "00112233445566778899aabbccddeeff",
+      "iss": "034f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa",
+      "iss_name": "Demo Issuer",
+      "sub": "033ddc48e59f6ecdcfb97cd01130f51ade234a03e9a250d47b20d4e5dbe0014714",
+      "iat": 1792999940,
+      "exp": 1793086340,
+      "claims": [
+        "4ab0cd1995f8a87d55b205f4801a03cb1a5c0919bcd32b6c4fbe0ffce0258f71",
+        "8ef7f102c477a95006df368757d41162374d601c127622662ec841027b466dd1",
+        "b2663e4b57a5202e77868e02d6c8a123522fe495c89e21ab0578e5f555481ac3"
+      ],
+      "sig": "ce3be36f7f34244aa8259f36720b5d509aa5182e3f86ad267383dd9aca2805a41ae8c399cdec88f7d0a2fdfb4d2b2d28d6384d8e97773fdfa92bb0368e075f00"
+    },
+    "disc": [
+      {
+        "k": "over_18",
+        "v": "true",
+        "s": "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+      },
+      {
+        "k": "country",
+        "v": "IN",
+        "s": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"
+      },
+      {
+        "k": "name",
+        "v": "Asha \"A\" Rao\n",
+        "s": "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c"
+      }
+    ]
+  },
+  "request": {
+    "typ": "primeid/request/v1",
+    "id": "ffeeddccbbaa99887766554433221100",
+    "aud": "02466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27",
+    "aud_name": "Club Entry",
+    "claim": "over_18",
+    "nonce": "0123456789abcdef0123456789abcdef",
+    "iat": 1792999995,
+    "exp": 1793000295,
+    "cert": {
+      "typ": "primeid/verifier-cert/v1",
+      "name": "Club Entry",
+      "pub": "02466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27",
+      "iss": "034f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa",
+      "iss_name": "Demo Issuer",
+      "exp": 1793086400,
+      "sig": "de715f21fdcb0d67cdbe53a05763b44b797a0caa620dfddd5191a17ba5b7aedd2ac0e384ab35d3431ad3c9fce6184c8a5697ba4766f61d4287a214d7fa5e6f8b"
+    },
+    "sig": "93bfdac6d15f869e7b3e8a74e24b68b0147a6b776ec18e70bbe6467cc6fa7e4e0a2ed04e5c979db1341f1939d6dd279630bb5417acce51c5cf6c9cbc627f8807"
+  },
+  "answer_canonical": "{\"aud\":\"02466d7fcae563e5cb09a0d1870bb580344804617879a14949cf22285f1bae3f27\",\"cred\":{\"claims\":[\"4ab0cd1995f8a87d55b205f4801a03cb1a5c0919bcd32b6c4fbe0ffce0258f71\",\"8ef7f102c477a95006df368757d41162374d601c127622662ec841027b466dd1\",\"b2663e4b57a5202e77868e02d6c8a123522fe495c89e21ab0578e5f555481ac3\"],\"exp\":1793086340,\"iat\":1792999940,\"id\":\"00112233445566778899aabbccddeeff\",\"iss\":\"034f355bdcb7cc0af728ef3cceb9615d90684bb5b2ca5f859ab0f0b704075871aa\",\"iss_name\":\"Demo Issuer\",\"sig\":\"ce3be36f7f34244aa8259f36720b5d509aa5182e3f86ad267383dd9aca2805a41ae8c399cdec88f7d0a2fdfb4d2b2d28d6384d8e97773fdfa92bb0368e075f00\",\"sub\":\"033ddc48e59f6ecdcfb97cd01130f51ade234a03e9a250d47b20d4e5dbe0014714\",\"typ\":\"primeid/credential/v1\"},\"disc\":{\"k\":\"over_18\",\"s\":\"0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a\",\"v\":\"true\"},\"nonce\":\"0123456789abcdef0123456789abcdef\",\"req\":\"6909039eb96f2be3bc6155b4270b77bf262919a2ce629ed66e4e06e1f4d8c079\",\"sig\":\"e55a0d14ab9272844591667583fb40e0772c631690568f7ecf8a774cc2eb06881034a9a893c6a2a37fcb25cdbff33785c74ff08bb8aa334c637c67e544ca42a6\",\"typ\":\"primeid/answer/v1\"}"
+}
