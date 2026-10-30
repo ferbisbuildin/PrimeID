@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: 2026 Foundation Devices, Inc. <hello@foundation.xyz>
+# SPDX-License-Identifier: MIT
+# Foundation KeyOS App Configuration for IncogID++ v1.0
+# Conforms to Foundation SDK v1.4.0 specification (https://docs.foundation.xyz/developers/building-apps/)
+
+app-name = "incogid-app"
+friendly-app-name = "IncogID++ Vault"
+launcher-app-name = "IncogID++"
+description = "Air-gapped selective disclosure credential vault for Passport Prime (KeyOS)"
+icon = "resources/icon.svg"
+app-id = "0x494e434f4749442b2b5052494d450100"
+version = "1.0.0"
+min-keyos-version = "1.4.0"
+theme = "resources/theme.json"
+
+[publisher]
+name = "Foundation Devices Open Source Ecosystem"
+contact-email = "hello@foundation.xyz"
+support-url = "https://docs.foundation.xyz"
+
+[permissions]
+"os/camera" = ["Subscribe", "NotifyVisible", "IsEnabled", "IsInUse"]
+"os/fs" = ["OpenFileMessage", "CloseFile", "ReadFile", "WriteFile", "SeekFile", "Flush", "CreateDirMessage"]
+"os/quantum-link" = ["GetXidDocument", "SendAccountUpdate", "PublishPsbt"]
+"os/security" = ["GetMasterKeyState", "AppSeed"]
+"os/settings" = ["GetDeviceName", "GetSystemTheme", "GetPrimeColor", "GetAirlockMode"]
+"os/gui-server" = ["GetPendingNavRequest", "SwitchToLauncher"]

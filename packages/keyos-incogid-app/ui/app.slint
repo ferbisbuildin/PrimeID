@@ -1,0 +1,165 @@
+// SPDX-License-Identifier: Apache-2.0
+// Foundation KeyOS Slint UI Specification for IncogID++ Vault
+// Conforms to Foundation SDK v1.4.0 @ui/widgets.slint design system
+
+import { BaseWindow, Card, Badge, Chip, Button, IconButton, PinEntry } from "@ui/widgets.slint";
+
+export component AppWindow inherits BaseWindow {
+    in-out property <string> device_name: "Passport Prime #0482";
+    in-out property <string> active_screen: "VAULT_HOME"; // VAULT_HOME, REVIEW_DISCLOSURE, SHOW_ANSWER_QR, CONFIRM_IMPORT, NFC_SCAN
+    in-out property <string> holder_pubkey_preview: "0279be667ef9dcbb...";
+    in-out property <int> credentials_count: 2;
+    in-out property <int> receipts_count: 5;
+    in-out property <bool> ql_connected: false;
+    
+    // Disclosure review properties
+    in-out property <string> requester_name: "Apex Exchange Compliance";
+    in-out property <bool> is_verified_requester: true;
+    in-out property <string> requested_claim_title: "Over 18 Legal Majority";
+    in-out property <string> requested_claim_key: "over_18";
+    in-out property <string> requested_claim_value: "true";
+    in-out property <string> concealed_claims_summary: "Name, Date of Birth, Passport Number, Home Address";
+    in-out property <string> challenge_nonce: "a4f89d30...";
+
+    callback approve_disclosure();
+    callback deny_disclosure();
+    callback switch_screen(string);
+    callback scan_qr_requested();
+    callback trigger_nfc_passport_scan();
+
+    preferred-width: 480px;
+    preferred-height: 800px;
+    background: #090B0E; // OLED true black
+
+    VerticalLayout {
+        padding: 16px;
+        spacing: 12px;
+
+        // KeyOS System Status Header
+        HorizontalLayout {
+            height: 28px;
+            alignment: space-between;
+            Text {
+                text: device_name;
+                color: #A3A8B4;
+                font-size: 13px;
+                font-family: "IBM Plex Mono";
+                vertical-alignment: center;
+            }
+            HorizontalLayout {
+                spacing: 6px;
+                if ql_connected: Badge {
+                    text: "QUANTUM LINK";
+                    variant: info;
+                }
+                Badge {
+                    text: "AIR-GAPPED";
+                    variant: success;
+                }
+            }
+        }
+
+        // Main Screen Router
+        if active_screen == "VAULT_HOME": VerticalLayout {
+            spacing: 14px;
+            Card {
+                title: "Hardware Vault Identity";
+                Text {
+                    text: "Holder Key (BIP32 m/1337'/0'/0'/0/0):";
+                    color: #A3A8B4;
+                    font-size: 11px;
+                }
+                Text {
+                    text: holder_pubkey_preview;
+                    font-family: "IBM Plex Mono";
+                    color: #D4AF37; // Foundation Brass Gold
+                    font-size: 13px;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                Card {
+                    title: "Credentials";
+                    Text {
+                        text: credentials_count + " Active";
+                        color: #10B981;
+                        font-weight: 700;
+                    }
+                }
+                Card {
+                    title: "Privacy Receipts";
+                    Text {
+                        text: receipts_count + " Stored";
+                        color: #60A5FA;
+                        font-weight: 700;
+                    }
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                Button {
+                    text: "Scan Verifier QR";
+                    icon: "camera";
+                    clicked => { root.scan_qr_requested(); }
+                }
+                Button {
+                    text: "Read e-Passport NFC";
+                    icon: "nfc";
+                    clicked => { root.trigger_nfc_passport_scan(); }
+                }
+            }
+        }
+
+        if active_screen == "REVIEW_DISCLOSURE": VerticalLayout {
+            spacing: 12px;
+            Card {
+                title: is_verified_requester ? "VERIFIED REQUESTER" : "UNKNOWN REQUESTER";
+                Badge {
+                    text: is_verified_requester ? "G7 / Exchange Verified" : "SECURITY WARNING: UNVERIFIED";
+                    variant: is_verified_requester ? success : danger;
+                }
+                Text {
+                    text: requester_name;
+                    font-size: 18px;
+                    color: #FFFFFF;
+                    font-weight: 700;
+                }
+                Text {
+                    text: "Challenge Nonce: " + challenge_nonce;
+                    font-family: "IBM Plex Mono";
+                    font-size: 11px;
+                    color: #9CA3AF;
+                }
+            }
+
+            Card {
+                title: "SELECTIVE DISCLOSURE DIFF";
+                Text {
+                    text: "SHARED: " + requested_claim_key + " = " + requested_claim_value;
+                    color: #10B981; // Green
+                    font-weight: 700;
+                }
+                Text {
+                    text: "KEPT PRIVATE ON DEVICE: " + concealed_claims_summary;
+                    color: #6B7280; // Gray
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 12px;
+                Button {
+                    text: "DENY (Back)";
+                    variant: secondary;
+                    clicked => { root.deny_disclosure(); }
+                }
+                Button {
+                    text: "APPROVE (Center)";
+                    variant: primary;
+                    clicked => { root.approve_disclosure(); }
+                }
+            }
+        }
+    }
+}

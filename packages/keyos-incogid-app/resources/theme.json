@@ -1,0 +1,20 @@
+{
+  "theme_name": "incogid-prime-oled",
+  "base": "dark",
+  "colors": {
+    "background": "#090B0E",
+    "surface": "#12151B",
+    "surface_elevated": "#1A1F29",
+    "border": "#252A36",
+    "accent_gold": "#D4AF37",
+    "accent_emerald": "#10B981",
+    "danger_ruby": "#EF4444",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A3A8B4",
+    "text_muted": "#5A6170"
+  },
+  "typography": {
+    "mono_font": "IBM Plex Mono",
+    "display_font": "Inter"
+  }
+}

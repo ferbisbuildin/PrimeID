@@ -1,0 +1,44 @@
+# Node & Dependencies
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Rust & Cargo
+target/
+**/*.rs.bk
+Cargo.lock
+
+# Foundation SDK & Build artifacts
+.foundation-sdk/
+*.elf
+*.bin
+*.app
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Temporary / Scratch files
+scratch/
+tmp/

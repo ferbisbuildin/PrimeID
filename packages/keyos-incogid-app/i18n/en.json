@@ -1,0 +1,19 @@
+{
+  "app": {
+    "title": "IncogID++ Vault",
+    "status_airgapped": "AIR-GAPPED",
+    "status_quantum_link": "QUANTUM LINK ACTIVE",
+    "holder_identity": "Hardware Vault Identity",
+    "scan_qr": "Scan QR Code",
+    "show_device_key": "Show Device Key",
+    "credentials_stored": "Stored Credentials",
+    "audit_receipts": "Privacy Receipts",
+    "disclosure_review": "Review Selective Disclosure",
+    "confirm_disclosure": "Approve & Sign",
+    "deny_disclosure": "Deny Request",
+    "claim_shared": "Disclosing to Verifier",
+    "claim_concealed": "Kept Sealed on Passport Prime",
+    "receipt_recorded": "Signed Receipt Saved to Flash",
+    "nfc_ready": "Hold e-Passport Near Device"
+  }
+}

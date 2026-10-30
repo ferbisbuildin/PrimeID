@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": false,
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "@core-crypto": ["packages/core-crypto/index.ts"],
+      "@core-crypto/*": ["packages/core-crypto/*"],
+      "@keyos-app": ["packages/keyos-incogid-app/index.ts"],
+      "@keyos-app/*": ["packages/keyos-incogid-app/*"]
+    }
+  },
+  "include": ["packages", "vite.config.ts", "*.d.ts"]
+}

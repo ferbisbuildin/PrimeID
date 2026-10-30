@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "passport-drive": {
+      "command": "foundation",
+      "args": ["mcp", "passport-drive"],
+      "description": "Foundation Passport Prime hardware debugging and sideloading MCP bridge"
+    }
+  }
+}
