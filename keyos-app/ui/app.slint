@@ -1,0 +1,302 @@
+import {
+    Theme,
+    UISize,
+    Images,
+    ControlSize,
+    ButtonVariant,
+} from "@ui/theme.slint";
+import { Callbacks, AppState, Screen, ClaimRow, CredRow, ReceiptRow } from "callbacks.slint";
+import { Button } from "@ui/button.slint";
+import { Card } from "@ui/card.slint";
+import { Chip, ChipColor } from "@ui/chip.slint";
+
+export { Callbacks, AppState, Screen, ClaimRow, CredRow, ReceiptRow, Theme, Images, ControlSize }
+
+component Label inherits Text {
+    color: Theme.palette-muted;
+    font-family: Theme.font-primary;
+    font-size: Theme.font-size-label;
+    font-weight: Theme.font-weight-semibold;
+    wrap: word-wrap;
+}
+
+component Body inherits Text {
+    color: Theme.palette-foreground;
+    font-family: Theme.font-primary;
+    font-size: Theme.font-size-body;
+    wrap: word-wrap;
+}
+
+// Full-screen page with a heading; children stack below it.
+component Page inherits Rectangle {
+    in property <string> heading;
+    width: 100%;
+    height: 100%;
+    background: Theme.palette-background;
+
+    VerticalLayout {
+        padding-left: Theme.spacing-xl;
+        padding-right: Theme.spacing-xl;
+        padding-top: Theme.spacing-xl + UISize.control-center-status-bar-height;
+        padding-bottom: Theme.spacing-xl;
+        spacing: Theme.spacing-md;
+
+        Text {
+            text: root.heading;
+            color: Theme.palette-foreground;
+            font-family: Theme.font-primary;
+            font-size: Theme.font-size-title;
+            font-weight: Theme.font-weight-semibold;
+            wrap: word-wrap;
+        }
+
+        @children
+    }
+}
+
+// QR display used for the holder key and for signed answers.
+component QrPage inherits Page {
+    heading: AppState.qr-title;
+
+    HorizontalLayout {
+        alignment: center;
+        Rectangle {
+            width: 420px;
+            height: 420px;
+            background: white;
+            Image {
+                width: 400px;
+                height: 400px;
+                source: AppState.qr-image;
+                image-rendering: pixelated;
+            }
+        }
+    }
+
+    Body { text: AppState.qr-caption; horizontal-alignment: center; }
+    Rectangle { vertical-stretch: 1; }
+    Button {
+        text: "Done";
+        size: ControlSize.lg;
+        full-width: true;
+        clicked => { Callbacks.go-home(); }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "PrimeID";
+    preferred-width: UISize.screen-width;
+    preferred-height: UISize.screen-height;
+    background: Theme.palette-background;
+
+    if AppState.screen == Screen.loading: Page {
+        heading: "PrimeID";
+        Body { text: AppState.message; }
+        Rectangle { vertical-stretch: 1; }
+    }
+
+    if AppState.screen == Screen.error: Page {
+        heading: "Stopped";
+        Body { text: AppState.message; }
+        Rectangle { vertical-stretch: 1; }
+        Button {
+            text: "Back";
+            size: ControlSize.lg;
+            full-width: true;
+            clicked => { Callbacks.dismiss-error(); }
+        }
+    }
+
+    if AppState.screen == Screen.home: Page {
+        heading: "PrimeID";
+        Label { text: "THIS PRIME'S HOLDER KEY"; }
+        Body { text: AppState.holder-fingerprint; font-weight: Theme.font-weight-semibold; }
+        Card {
+            width: 100%;
+            title: AppState.credential-count + " credential(s)";
+            body: AppState.issuer-count + " trusted issuer(s)";
+            footer: "Documents stay on this device. Only the fact you approve leaves it.";
+        }
+        if AppState.notice != "": Body { text: AppState.notice; color: Theme.palette-muted; }
+        Rectangle { vertical-stretch: 1; }
+        Button {
+            text: "Scan QR";
+            size: ControlSize.lg;
+            full-width: true;
+            clicked => { Callbacks.scan(); }
+        }
+        Button {
+            text: "Import from file";
+            variant: ButtonVariant.secondary;
+            full-width: true;
+            clicked => { Callbacks.import-file(); }
+        }
+        Button {
+            text: "Show my holder key";
+            variant: ButtonVariant.secondary;
+            full-width: true;
+            clicked => { Callbacks.show-key(); }
+        }
+        HorizontalLayout {
+            spacing: Theme.spacing-md;
+            Button {
+                text: "Credentials";
+                variant: ButtonVariant.tertiary;
+                full-width: true;
+                clicked => { Callbacks.show-credentials(); }
+            }
+            Button {
+                text: "Receipts";
+                variant: ButtonVariant.tertiary;
+                full-width: true;
+                clicked => { Callbacks.show-receipts(); }
+            }
+        }
+    }
+
+    if AppState.screen == Screen.holder-qr || AppState.screen == Screen.answer-qr: QrPage { }
+
+    if AppState.screen == Screen.import-review: Page {
+        heading: "Credential offer";
+        HorizontalLayout {
+            alignment: start;
+            Chip {
+                text: AppState.offer-issuer-trusted ? "Trusted issuer" : "New issuer";
+                color: AppState.offer-issuer-trusted ? ChipColor.success : ChipColor.warning;
+            }
+        }
+        Card {
+            width: 100%;
+            eyebrow: "ISSUER";
+            title: AppState.offer-issuer;
+            subtitle: "Key " + AppState.offer-issuer-fingerprint;
+            body: AppState.offer-warning;
+            footer: "Expires " + AppState.offer-expires;
+        }
+        Label { text: "CLAIMS (STORED ON THIS PRIME ONLY)"; }
+        Flickable {
+            vertical-stretch: 1;
+            viewport-width: self.width;
+            viewport-height:claims.preferred-height;
+            claims := VerticalLayout {
+                width: parent.width;
+                spacing: Theme.spacing-xs;
+                for row in AppState.offer-claims: Body { text: row.key + ": " + row.value; }
+            }
+        }
+        Button {
+            text: AppState.offer-issuer-trusted ? "Save credential" : "Trust issuer and save";
+            size: ControlSize.lg;
+            full-width: true;
+            clicked => { Callbacks.accept-offer(); }
+        }
+        Button {
+            text: "Reject";
+            variant: ButtonVariant.ghost;
+            full-width: true;
+            clicked => { Callbacks.go-home(); }
+        }
+    }
+
+    if AppState.screen == Screen.request-review: Page {
+        heading: "Proof request";
+        HorizontalLayout {
+            alignment: start;
+            Chip {
+                text: AppState.req-verified ? "Verified requester" : "Unverified requester";
+                color: AppState.req-verified ? ChipColor.success : ChipColor.danger;
+            }
+        }
+        Card {
+            width: 100%;
+            eyebrow: "REQUESTER";
+            title: AppState.req-name;
+            subtitle: AppState.req-detail;
+            body: "Key " + AppState.req-fingerprint;
+            footer: "Request expires " + AppState.req-expires;
+        }
+        Card {
+            width: 100%;
+            eyebrow: "ASKS FOR";
+            title: AppState.req-claim;
+            body: AppState.req-share;
+        }
+        if AppState.req-withheld.length > 0: Label { text: "STAYS ON PRIME"; }
+        Flickable {
+            vertical-stretch: 1;
+            viewport-width: self.width;
+            viewport-height:withheld.preferred-height;
+            withheld := VerticalLayout {
+                width: parent.width;
+                spacing: Theme.spacing-xs;
+                for key in AppState.req-withheld: Body { text: key; color: Theme.palette-muted; }
+            }
+        }
+        Button {
+            text: "Approve and sign";
+            size: ControlSize.lg;
+            full-width: true;
+            disabled: !AppState.req-can-answer;
+            clicked => { Callbacks.approve(); }
+        }
+        Button {
+            text: "Deny";
+            variant: ButtonVariant.danger;
+            full-width: true;
+            clicked => { Callbacks.deny(); }
+        }
+    }
+
+    if AppState.screen == Screen.credentials: Page {
+        heading: "Credentials";
+        if AppState.credentials.length == 0: Body { text: "No credentials yet. Scan an issuer's offer QR."; color: Theme.palette-muted; }
+        Flickable {
+            vertical-stretch: 1;
+            viewport-width: self.width;
+            viewport-height:creds.preferred-height;
+            creds := VerticalLayout {
+                width: parent.width;
+                spacing: Theme.spacing-md;
+                for c in AppState.credentials: Card {
+                    width: 100%;
+                    eyebrow: c.expired ? "EXPIRED" : "ISSUED BY";
+                    title: c.issuer;
+                    subtitle: "Key " + c.issuer-fingerprint;
+                    body: c.claims;
+                    footer: "Expires " + c.expires;
+                }
+            }
+        }
+        Button {
+            text: "Back";
+            full-width: true;
+            clicked => { Callbacks.go-home(); }
+        }
+    }
+
+    if AppState.screen == Screen.receipts: Page {
+        heading: "Receipts";
+        if AppState.receipts.length == 0: Body { text: "No requests answered yet."; color: Theme.palette-muted; }
+        Flickable {
+            vertical-stretch: 1;
+            viewport-width: self.width;
+            viewport-height:recs.preferred-height;
+            recs := VerticalLayout {
+                width: parent.width;
+                spacing: Theme.spacing-md;
+                for r in AppState.receipts: Card {
+                    width: 100%;
+                    eyebrow: r.when + (r.verified ? "  VERIFIED" : "  UNVERIFIED");
+                    title: r.requester;
+                    subtitle: r.claim + ": " + r.outcome;
+                    body: r.withheld;
+                }
+            }
+        }
+        Button {
+            text: "Back";
+            full-width: true;
+            clicked => { Callbacks.go-home(); }
+        }
+    }
+}

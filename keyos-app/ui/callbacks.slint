@@ -1,0 +1,85 @@
+// UI state and actions shared with src/app.rs. Rust owns all logic; Slint only renders.
+
+export enum Screen {
+    loading,
+    home,
+    holder-qr,
+    import-review,
+    request-review,
+    answer-qr,
+    credentials,
+    receipts,
+    error,
+}
+
+export struct ClaimRow {
+    key: string,
+    value: string,
+}
+
+export struct CredRow {
+    issuer: string,
+    issuer-fingerprint: string,
+    claims: string,
+    expires: string,
+    expired: bool,
+}
+
+export struct ReceiptRow {
+    when: string,
+    requester: string,
+    verified: bool,
+    claim: string,
+    outcome: string,
+    withheld: string,
+}
+
+export global AppState {
+    in-out property <Screen> screen: Screen.loading;
+    // Loading text, error text, or a one-line notice on the home screen.
+    in property <string> message: "Unlocking PrimeID...";
+    in property <string> notice;
+
+    in property <string> holder-fingerprint;
+    in property <int> credential-count;
+    in property <int> issuer-count;
+
+    in property <image> qr-image;
+    in property <string> qr-title;
+    in property <string> qr-caption;
+
+    // Credential offer review.
+    in property <string> offer-issuer;
+    in property <string> offer-issuer-fingerprint;
+    in property <bool> offer-issuer-trusted;
+    in property <string> offer-warning;
+    in property <string> offer-expires;
+    in property <[ClaimRow]> offer-claims;
+
+    // Proof request review.
+    in property <string> req-name;
+    in property <bool> req-verified;
+    in property <string> req-detail;
+    in property <string> req-fingerprint;
+    in property <string> req-claim;
+    in property <string> req-expires;
+    in property <bool> req-can-answer;
+    in property <string> req-share;
+    in property <[string]> req-withheld;
+
+    in property <[CredRow]> credentials;
+    in property <[ReceiptRow]> receipts;
+}
+
+export global Callbacks {
+    callback show-key();
+    callback scan();
+    callback import-file();
+    callback accept-offer();
+    callback approve();
+    callback deny();
+    callback go-home();
+    callback show-credentials();
+    callback show-receipts();
+    callback dismiss-error();
+}

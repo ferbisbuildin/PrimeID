@@ -1,0 +1,24 @@
+# Foundation application configuration
+app-name = "primeid"
+friendly-app-name = "PrimeID"
+launcher-app-name = "PrimeID"
+description = "Prove the fact, keep the document"
+icon = "resources/icon.svg"
+theme = "resources/theme.json"
+# The app id is the domain-separation input to GetAppSeed. Changing it rotates the holder key
+# and makes every stored credential unusable. Never change it.
+app-id = "0x1e26074ac5ea2fc0f71a82427c438d78"
+min-keyos-version = "1.0.0"
+
+[publisher]
+name = "PrimeID"
+contact-email = "ishank@thehirehub.ai"
+support-url = "https://github.com/ferbisbuildin/IncogID"
+
+[permissions]
+# gui-app: window, ShowModal (system QR scanner and file picker). fs-generic: durable AppData vault.
+template = ["gui-app", "fs-generic"]
+# Per-app seed from the secure element; KeyOS asks the user once on first use.
+"os/security" = ["GetAppSeed"]
+# Read a credential/request file the user picks from internal storage or USB.
+"os/fs" = ["GetUserReadAccess", "GetUsbReadAccess"]

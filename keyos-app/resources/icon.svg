@@ -1,0 +1,10 @@
+<svg width="110" height="110" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- No background: the launcher draws its own badge plate behind the glyph.
+       Glyph is ~58% of the canvas and centred, per the SDK icon rules. -->
+  <g transform="translate(54 50)">
+    <!-- Shield: the document stays protected on Prime. -->
+    <path d="M74 0L148 28V76C148 118 117 146 74 156C31 146 0 118 0 76V28L74 0Z" fill="#EEF2FF"/>
+    <!-- Check: only the proven fact leaves. -->
+    <path d="M40 80L64 104L110 56" stroke="#2563EB" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

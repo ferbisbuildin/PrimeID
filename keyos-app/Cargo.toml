@@ -1,0 +1,36 @@
+[package]
+name = "primeid"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+exclude = [".foundation-sdk"]
+
+[dependencies]
+log = "0.4"
+log-server = { package = "xous-api-log", path = ".foundation-sdk/current/lib/keyos/xous/api/log" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+server = { path = ".foundation-sdk/current/lib/keyos/server" }
+fs = { path = ".foundation-sdk/current/lib/keyos/api/fs" }
+security = { path = ".foundation-sdk/current/lib/keyos/api/security" }
+slint-keyos-platform = { path = ".foundation-sdk/current/lib/keyos/slint-keyos-platform/runtime" }
+foundation-themes = { path = ".foundation-sdk/current/lib/keyos/sdk/crates/foundation-themes" }
+# Routed to the hardware TRNG on device by the [patch] below.
+getrandom = "0.2"
+zeroize = "1.8"
+primeid-core = { path = "../crates/primeid-core" }
+
+[build-dependencies]
+slint-keyos-platform-build = { path = ".foundation-sdk/current/lib/keyos/slint-keyos-platform/build" }
+
+# Unoptimized k256/AES can stall the device UI (SDK migration guide, gotcha 16).
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+# Randomness is pre-wired: getrandom 0.2 calls route to the TRNG on device.
+[patch.crates-io]
+getrandom = { path = ".foundation-sdk/current/lib/keyos/imports/getrandom" }
