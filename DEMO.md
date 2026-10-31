@@ -23,7 +23,7 @@ bash /mnt/c/Users/varda/documents/foundation/scripts/sim-e2e.sh
 
 - **Camera (real QR):** needs the webcam passed into WSL (see "Webcam" below). On Prime tap **Scan QR**,
   then hold the `.png` (opened on your phone) up to the laptop camera.
-- **Simulator without a camera:** on Prime tap **Enter payload**, tap the field, then in WSL run
+- **Simulator without a camera:** on Prime tap **Enter payload**, tap the field, then in WSL run `bash scripts/sim-send.sh .primeid-demo/credential.json` (or, with no argument, it types the clipboard:
   `bash scripts/sim-send.sh` after copying the `.json` text (`Get-Content .primeid-demo\credential.json | Set-Clipboard`).
   It runs exactly the same checks as a scan.
 
