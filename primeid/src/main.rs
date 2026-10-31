@@ -109,10 +109,7 @@ fn unlock(cx: AppContext, ui: &AppWindow) {
     let state = Rc::new(RefCell::new(State { key, pubkey, vault, pending: None }));
     let fs = cx.fs.clone();
     let save = Rc::new(move |v: &Vault| -> bool {
-        log::info!("saving vault");
-        let res = fs.durable_file_write(STATE_FILE, Location::AppData, &serde_json::to_vec(v).unwrap());
-        log::info!("vault save result ok={}", res.is_ok());
-        let ok = res.is_ok();
+        let ok = fs.durable_file_write(STATE_FILE, Location::AppData, &serde_json::to_vec(v).unwrap()).is_ok();
         if !ok {
             log::error!("vault write failed");
         }
@@ -347,9 +344,9 @@ fn decide(ui: &AppWindow, s: &mut State, save: &dyn Fn(&Vault) -> bool, approved
                 s.vault.trusted.retain(|t| !(t.pubkey == tr.pubkey && t.issuer == tr.issuer));
                 s.vault.trusted.push(tr.clone());
                 if !save(&s.vault) {
-                    return show_msg(ui, false, "Storage error", "Could not save the trusted verifier.");
+                    return show_msg(ui, false, "Storage error", "Could not save the trusted party.");
                 }
-                let what = if tr.issuer { "Credentials it signs can now be imported." } else { "Its requests will show as a verified requester." };
+                let what = if tr.issuer { "Credentials it signs can now be imported." } else { "Its requests will show as Trusted by you." };
                 show_msg(ui, true, "Trusted", &format!("{}: {what}", tr.name));
             } else {
                 ui.set_screen("HOME".into());

@@ -46,9 +46,11 @@ list. The other claims stay as opaque hashes.
 **Wire format:** secp256k1 ECDSA, compact `r‖s`, over SHA-256 of RFC 8785 canonical JSON. The device side
 (Rust, `k256`) and the laptop side (JS, `@noble/curves`) are cross-checked by shared test fixtures.
 
-## Screenshots (real app in the KeyOS simulator)
+## Demo video
 
-Demo video: [docs/PrimeID-demo.mp4](docs/PrimeID-demo.mp4)
+[**Watch the full demo: docs/PrimeID_Demo.mp4**](docs/PrimeID_Demo.mp4). It's a screen recording of the real app in the KeyOS simulator: the honest flow, all four attacks, and revocation.
+
+## Screenshots (real app in the KeyOS simulator)
 
 | Holder key QR | Credential stored | Request review | Signed answer |
 |---|---|---|---|
