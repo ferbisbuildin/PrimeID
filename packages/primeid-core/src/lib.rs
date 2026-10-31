@@ -1,4 +1,4 @@
-//! PrimeID device-side logic. Wire format matches packages/core-crypto:
+//! PrimeID device-side logic. Wire format matches scripts/primeid.mjs:
 //! signature = secp256k1 compact(r||s) over SHA-256(RFC 8785 canonical JSON).
 
 pub use k256;

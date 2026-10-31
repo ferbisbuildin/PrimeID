@@ -278,7 +278,7 @@ export component AppWindow inherits Window {
         if screen == "REVIEW": VerticalLayout {
             spacing: 14px;
             Pill {
-                text: req-trusted ? "Verified requester" : "Unknown requester";
+                text: req-trusted ? "Trusted by you" : "Not in your trusted list";
                 dot: req-trusted ? Ink.ok : Ink.bad;
             }
             Text { text: req-name; color: Ink.ink; font-family: Theme.font-primary; font-size: 30px; font-weight: 600; wrap: word-wrap; letter-spacing: -0.5px; }

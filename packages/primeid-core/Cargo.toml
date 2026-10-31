@@ -3,7 +3,7 @@ name = "primeid-core"
 version = "0.1.0"
 edition = "2021"
 license = "Apache-2.0"
-description = "PrimeID wire format and checks, byte-compatible with packages/core-crypto"
+description = "PrimeID wire format and checks, byte-compatible with scripts/primeid.mjs (noble)"
 
 [dependencies]
 k256 = { version = "0.13", features = ["ecdsa", "sha256"] }

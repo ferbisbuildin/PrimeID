@@ -125,7 +125,13 @@ switch (cmd) {
     ];
     for (const [n, ok] of checks) console.log(`${ok ? "PASS" : "FAIL"}  ${n}`);
     const ok = checks.every((c) => c[1]);
-    console.log(ok ? `\nVERIFIED: ${a.disclosed_claim.key} = ${a.disclosed_claim.value}` : "\nREJECTED");
+    // A valid proof of "over_18 = false" proves the person is NOT over 18: yes/no claims must be "true".
+    const yesNo = ["true", "false"].includes(a.disclosed_claim.value);
+    const accepted = ok && (!yesNo || a.disclosed_claim.value === "true");
+    if (!ok) console.log("\nREJECTED: proof invalid");
+    else if (!accepted) console.log(`\nPROOF VALID, BUT NOT ACCEPTED: ${a.disclosed_claim.key} = ${a.disclosed_claim.value}`);
+    else console.log(`\nVERIFIED: ${a.disclosed_claim.key} = ${a.disclosed_claim.value}`);
+    if (!accepted) process.exit(1);
     if (ok) { delete st.openRequest; save(); } // one-time nonce: a second presentation is a replay
     process.exit(ok ? 0 : 1);
   }

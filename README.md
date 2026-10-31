@@ -51,14 +51,14 @@ list. The other claims stay as opaque hashes.
 | Holder key QR | Credential stored | Request review | Signed answer |
 |---|---|---|---|
 | ![key](docs/screenshots/01-key.png) | ![credential](docs/screenshots/02-credential.png) | ![review](docs/screenshots/03-review.png) | ![answer](docs/screenshots/04-answer.png) |
-| Key from the secure-element app seed; the issuer reads this QR | Issuer signature valid, bound to this Prime | Green **Verified requester**; only `over_18` is shared | One claim, signed, bound to the nonce |
+| Key from the secure-element app seed; the issuer reads this QR | Issuer signature valid, bound to this Prime | Green **Trusted by you** (key is in your trusted verifiers); only `over_18` is shared | One claim, signed, bound to the nonce |
 
 **Attacks, all stopped:**
 
 | Forged "AI fake ID" | Copied credential | Fake bank (phishing) | Revoked credential |
 |---|---|---|---|
 | ![forged](docs/screenshots/05-forged.png) | ![copied](docs/screenshots/06-copied.png) | ![fakebank](docs/screenshots/07-fakebank.png) | ![revoked](docs/screenshots/09-after-revoke.png) |
-| Signed by a key the user never trusted | Bound to a different device's key | Name is self-claimed, key unknown: red badge | Issuer-signed revocation list, so Prime refuses to answer |
+| **Untrusted issuer**: validly signed, but by a key the user never trusted (Prime and the verifier both reject it) | Bound to a different device's key | Name is self-claimed, key not in your list: **Not in your trusted list** | Issuer-signed revocation list, so Prime refuses to answer |
 
 The fourth attack, a **replayed answer**, is caught by the verifier: a new request has a new nonce, so the
 old answer fails check 4.
@@ -84,7 +84,8 @@ If the secure element refuses the seed, the app shows an error screen. There is 
 
 On **Prime** (`packages/primeid-core`, Rust):
 - issuer signature → issuer in the user's **trusted issuers** → holder key == this Prime → not expired → every disclosed salt matches a signed hash
-- the request signature is verified; the requester is shown green only if its key is in the user's **trusted verifiers**
+- the request signature is verified; the requester is shown green (**Trusted by you**) only if its key is in the user's own **trusted verifiers** list
+- the verifier accepts an answer only from an issuer **it** trusts, and a yes/no claim only when its value is `true`: a valid proof of `over_18 = false` prints *PROOF VALID, BUT NOT ACCEPTED*
 - expiry is re-checked at the moment of approval; nothing is revealed without an on-device tap
 - revocation lists are accepted only from trusted issuers, and an older list cannot replace a newer one
 - a credential ID from a different issuer cannot overwrite a stored credential
@@ -104,6 +105,7 @@ holder signature, nonce and verifier key, expiry, and the requested claim. Each 
 | `scripts/sim-send.sh` | Types a payload into the simulator (stand-in for the camera) |
 | `DEMO.md` | Step-by-step live demo runbook |
 | `docs/idea.md` | Original product document |
+| `archive/` | Earlier prototype (IncogID web suite and mock apps), kept for history only. **Not part of PrimeID** |
 
 ## Run it
 
@@ -123,6 +125,18 @@ node scripts/primeid.mjs attack forged|copied|fakebank
 node scripts/primeid.mjs revoke
 ```
 Unit tests: `cd packages/primeid-core && cargo test`.
+
+## Trust model (what the green badge means)
+
+The badge means **"trusted by you"**: the requester's key is one *this user* added to Prime earlier. In
+this demo, trust cards are added by hand, and they are not signed by anyone. A phishing site could therefore
+try to get its own trust card accepted first, which is why adding one needs an explicit on-device
+**Trust** tap on a screen that shows the name, role and key. In production, verifiers and issuers would be registered with a trust
+authority (for example a government or industry registry) that signs their keys, and Prime would ship
+with that authority's root key instead of relying on hand-added cards.
+
+> The screenshots were captured before the badge was renamed. They show the old wording, *Verified requester*
+> and *Unknown requester*, for the same check.
 
 ## Test status (honest)
 

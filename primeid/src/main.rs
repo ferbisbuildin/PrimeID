@@ -196,7 +196,7 @@ fn refresh(ui: &AppWindow, s: &State) {
         .iter()
         .rev()
         .map(|r| {
-            let who = if r.trusted { "Verified" } else { "Unknown" };
+            let who = if r.trusted { "Trusted" } else { "Untrusted" };
             let what = match (&r.shared, r.approved) {
                 (Some(val), true) => format!("shared {} = {}", r.claim, val),
                 _ => format!("DENIED {}", r.claim),

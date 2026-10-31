@@ -23,9 +23,8 @@ bash /mnt/c/Users/varda/documents/foundation/scripts/sim-e2e.sh
 
 - **Camera (real QR):** needs the webcam passed into WSL (see "Webcam" below). On Prime tap **Scan QR**,
   then hold the `.png` (opened on your phone) up to the laptop camera.
-- **Simulator without a camera:** on Prime tap **Enter payload**, tap the field, then in WSL run `bash scripts/sim-send.sh .primeid-demo/credential.json` (or, with no argument, it types the clipboard:
-  `bash scripts/sim-send.sh` after copying the `.json` text (`Get-Content .primeid-demo\credential.json | Set-Clipboard`).
-  It runs exactly the same checks as a scan.
+- **Simulator without a camera:** on Prime tap **Enter payload**, tap the field, then in WSL run `bash scripts/sim-send.sh .primeid-demo/credential.json` (any payload file), wait for
+  "Typed … bytes", then tap **Verify**. It runs exactly the same checks as a scan.
 
 ## The flow (Windows terminal in `C:\Users\varda\documents\foundation`)
 
@@ -34,7 +33,7 @@ bash /mnt/c/Users/varda/documents/foundation/scripts/sim-e2e.sh
 | 1 | `node scripts/primeid.mjs trust issuer` and `... trust verifier` | Load each trust card → **Trust** |
 | 2 | Screenshot Prime's **My key QR** screen, then `node scripts/primeid.mjs key <screenshot.png>` | shows its holder key QR |
 | 3 | `node scripts/primeid.mjs issue` | Load `credential` → "Credential stored · issuer signature valid · bound to this Prime" |
-| 4 | `node scripts/primeid.mjs request` | Load `request` → green **Verified requester**, *shared: over_18 = true*, *stays: country, name* → **Approve** |
+| 4 | `node scripts/primeid.mjs request` | Load `request` → green **Trusted by you**, *shared: over_18 = true*, *stays: country, name* → **Approve** |
 | 5 | Screenshot the answer QR, then `node scripts/primeid.mjs verify <screenshot.png>` | shows the signed answer QR |
 | 6 | prints **VERIFIED: over_18 = true** with each check | Home → **Receipts** shows the entry |
 
@@ -42,10 +41,10 @@ bash /mnt/c/Users/varda/documents/foundation/scripts/sim-e2e.sh
 
 | Attack | Laptop | Result |
 |--------|--------|--------|
-| Forged "AI fake ID" | `attack forged`, load on Prime | Prime: *Issuer key is not in your trusted issuers* |
+| Forged "AI fake ID" (untrusted issuer) | `attack forged`, load on Prime | Prime: *Issuer key is not in your trusted issuers*. The signature itself is valid, but from a key nobody trusts; the verifier rejects untrusted issuers too |
 | Copied credential | `attack copied`, load on Prime | Prime: *Credential is bound to a different device key* |
 | Replayed answer | `request` (new nonce), then `verify` the **old** answer screenshot | Verifier: nonce check FAILS |
-| Fake bank | `attack fakebank`, load on Prime | Prime: red **Unknown requester · HDFC Bank** → Deny |
+| Fake bank | `attack fakebank`, load on Prime | Prime: red **Not in your trusted list** · HDFC Bank → Deny |
 
 Bonus, revocation: `node scripts/primeid.mjs revoke`, load on Prime → *1 credential revoked*; a new `request` then gets *Cannot answer*.
 
