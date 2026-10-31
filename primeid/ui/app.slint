@@ -1,0 +1,401 @@
+// SPDX-FileCopyrightText: 2026 Foundation Devices, Inc. <hello@foundation.xyz>
+// SPDX-License-Identifier: MIT
+// "Liquid glass" look: storm-teal backdrop, translucent white panels with a hairline edge.
+
+import { Theme, UISize, Images, ControlSize } from "@ui/theme.slint";
+
+export { Theme, Images, ControlSize }
+
+global Ink {
+    out property <color> ink: #ffffff;
+    out property <color> soft: #ffffffd9;
+    out property <color> dim: #ffffff99;
+    out property <color> line: #ffffff33;
+    out property <color> ok: #5eead4;
+    out property <color> bad: #fb7185;
+}
+
+component Glass inherits Rectangle {
+    in property <length> pad: 18px;
+    in property <color> tint: transparent;
+    in property <bool> interactive: false;
+    callback clicked();
+    border-radius: 24px;
+    border-width: 1px;
+    border-color: Ink.line;
+    // Flat fill: the KeyOS software renderer does not clip gradients to border-radius.
+    background: #ffffff38;
+    Rectangle { border-radius: parent.border-radius; background: tint; }
+    VerticalLayout {
+        padding: root.pad;
+        spacing: 6px;
+        @children
+    }
+    // Overlay so the whole card is the tap target (a TouchArea child would be a layout row).
+    if interactive: TouchArea { clicked => { root.clicked(); } }
+}
+
+component Eyebrow inherits Text {
+    color: Ink.dim;
+    font-family: Theme.font-primary;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+}
+
+component T inherits Text {
+    color: Ink.ink;
+    font-family: Theme.font-primary;
+    font-size: 16px;
+    wrap: word-wrap;
+}
+
+component Mono inherits Text {
+    color: Ink.soft;
+    font-family: "Source Code Pro";
+    font-size: 13px;
+    wrap: char-wrap;
+}
+
+component Pill inherits Rectangle {
+    in property <string> text;
+    in property <color> dot: Ink.ok;
+    height: 34px;
+    width: row.preferred-width + 30px;
+    border-radius: 17px;
+    border-width: 1px;
+    border-color: Ink.line;
+    background: #ffffff2d;
+    // fills the pill so content stays centred even when a parent layout stretches it
+    row := HorizontalLayout {
+        spacing: 8px;
+        alignment: center;
+        VerticalLayout {
+            alignment: center;
+            Rectangle { width: 8px; height: 8px; border-radius: 4px; background: dot; }
+        }
+        Text { text: root.text; color: Ink.ink; font-family: Theme.font-primary; font-size: 13px; font-weight: 600; vertical-alignment: center; }
+    }
+}
+
+component Btn inherits Rectangle {
+    in property <string> text;
+    in property <bool> solid: false;
+    in property <color> accent: Ink.ink;
+    callback clicked();
+    height: 54px;
+    border-radius: 27px;
+    border-width: solid ? 0px : 1px;
+    border-color: Ink.line;
+    background: solid ? (ta.pressed ? accent.darker(15%) : accent) : (ta.pressed ? #ffffff3d : #ffffff26);
+    Text {
+        text: root.text;
+        color: solid ? #04121b : Ink.ink;
+        font-family: Theme.font-primary;
+        font-size: 16px;
+        font-weight: 700;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+    }
+    ta := TouchArea { clicked => { root.clicked(); } }
+}
+
+component Stat inherits Glass {
+    in property <string> label;
+    in property <int> value;
+    interactive: true;
+    Eyebrow { text: label; }
+    Text { text: value; color: Ink.ink; font-family: Theme.font-primary; font-size: 52px; font-weight: 500; letter-spacing: -2px; }
+    T { text: "View  ›"; font-size: 13px; color: Ink.dim; }
+}
+
+export component AppWindow inherits Window {
+    title: "PrimeID";
+    preferred-width: UISize.screen-width;
+    preferred-height: UISize.screen-height;
+    background: #04121b;
+
+    in-out property <string> screen: "HOME"; // HOME KEY ENTER REVIEW TRUST ANSWER CREDS RECEIPTS MESSAGE FATAL UNLOCK
+    in property <string> holder-pubkey;
+    in property <image> key-qr;
+    in property <int> credential-count;
+    in property <int> receipt-count;
+    in property <[string]> credentials;
+    in property <[string]> receipts;
+
+    in property <bool> req-trusted;
+    in property <string> req-name;
+    in property <string> req-key;
+    in property <string> req-claim;
+    in property <string> req-value;
+    in property <string> req-kept;
+    in property <int> req-expires-in;
+
+    in property <image> answer-qr;
+    in property <string> answer-text;
+
+    in property <bool> msg-ok;
+    in property <string> msg-title;
+    in property <string> msg-body;
+    in property <string> fatal;
+
+    callback scan();
+    callback submit-text(string);
+    callback decide(bool);
+    callback wipe();
+
+    // Storm backdrop: deep teal-black with two soft glows.
+    Rectangle { background: @linear-gradient(165deg, #0d3640 0%, #08222c 38%, #04121b 100%); }
+    Rectangle {
+        x: parent.width * 0.35; y: -parent.height * 0.12;
+        width: parent.width * 0.95; height: parent.width * 0.95;
+        background: @radial-gradient(circle, #2dd4bf38 0%, #2dd4bf00 70%);
+    }
+    Rectangle {
+        x: -parent.width * 0.4; y: parent.height * 0.55;
+        width: parent.width * 1.1; height: parent.width * 1.1;
+        background: @radial-gradient(circle, #38bdf826 0%, #38bdf800 70%);
+    }
+    Rectangle { background: @linear-gradient(180deg, #04121b00 55%, #04121bb3 100%); }
+
+    VerticalLayout {
+        padding-left: 22px;
+        padding-right: 22px;
+        padding-top: 18px + UISize.control-center-status-bar-height;
+        padding-bottom: 22px;
+        spacing: 16px;
+
+        // Header
+        HorizontalLayout {
+            spacing: 12px;
+            Rectangle {
+                width: 44px; height: 44px; border-radius: 22px;
+                border-width: 1px; border-color: Ink.line; background: #ffffff1a;
+                Image { width: 30px; height: 30px; source: Images.image("logo"); image-fit: contain; }
+            }
+            VerticalLayout {
+                alignment: center;
+                Text { text: "Passport Prime"; color: Ink.dim; font-family: Theme.font-primary; font-size: 12px; }
+                Text { text: "PrimeID"; color: Ink.ink; font-family: Theme.font-primary; font-size: 19px; font-weight: 700; letter-spacing: -0.3px; }
+            }
+            Rectangle { horizontal-stretch: 1; }
+            if screen != "HOME" && screen != "REVIEW" && screen != "TRUST" && screen != "FATAL" && screen != "UNLOCK" && screen != "WIPE": Rectangle {
+                width: 44px; height: 44px; border-radius: 22px;
+                border-width: 1px; border-color: Ink.line; background: home-ta.pressed ? #ffffff3d : #ffffff26;
+                Text { text: "‹"; color: Ink.ink; font-size: 26px; horizontal-alignment: center; vertical-alignment: center; }
+                home-ta := TouchArea { clicked => { root.screen = "HOME"; } }
+            }
+        }
+
+        if screen == "HOME": VerticalLayout {
+            spacing: 16px;
+            Pill { text: "Air-gapped credential vault"; }
+            VerticalLayout {
+                spacing: 0px;
+                Text { text: "Prove the fact,"; color: Ink.ink; font-family: Theme.font-primary; font-size: 38px; font-weight: 500; letter-spacing: -0.8px; }
+                Text { text: "keep the document."; color: Ink.ink; font-family: Theme.font-primary; font-size: 38px; font-weight: 500; letter-spacing: -0.8px; }
+            }
+            T { text: "Share one claim, signed by this device, only after you approve it here."; color: Ink.soft; font-size: 15px; }
+            Glass {
+                interactive: true;
+                clicked => { root.screen = "KEY"; }
+                Eyebrow { text: "HOLDER KEY · SECURE ELEMENT"; }
+                Mono { text: holder-pubkey; }
+            }
+            HorizontalLayout {
+                spacing: 14px;
+                Stat { label: "CREDENTIALS"; value: credential-count; clicked => { root.screen = "CREDS"; } }
+                Stat { label: "RECEIPTS"; value: receipt-count; clicked => { root.screen = "RECEIPTS"; } }
+            }
+            Rectangle { vertical-stretch: 1; }
+            Btn { text: "Scan QR"; solid: true; clicked => { root.scan(); } }
+            HorizontalLayout {
+                spacing: 12px;
+                Btn { text: "My key QR"; clicked => { root.screen = "KEY"; } }
+                Btn { text: "Enter payload"; clicked => { root.screen = "ENTER"; } }
+            }
+        }
+
+        if screen == "UNLOCK": VerticalLayout {
+            spacing: 14px;
+            alignment: center;
+            Pill { text: "Secure element"; dot: #fbbf24; }
+            Text { text: "Unlocking your\ndevice-bound key"; color: Ink.ink; font-family: Theme.font-primary; font-size: 32px; font-weight: 500; }
+            T { text: "Approve the KeyOS permission prompt if one appears. The key never leaves this Prime."; color: Ink.soft; }
+        }
+
+        if screen == "KEY": VerticalLayout {
+            spacing: 16px;
+            Pill { text: "Step 1 · Show to issuer"; }
+            Glass {
+                pad: 14px;
+                Rectangle {
+                    height: 320px; border-radius: 16px; background: #ffffff; clip: true;
+                    Image { width: parent.width - 16px; height: parent.height - 16px; source: key-qr; image-fit: contain; }
+                }
+            }
+            Mono { text: holder-pubkey; }
+            T { text: "The issuer signs this key into your credential, so a copied credential is useless on any other device."; color: Ink.soft; font-size: 14px; }
+        }
+
+        if screen == "ENTER": VerticalLayout {
+            spacing: 14px;
+            Pill { text: "Simulator input"; dot: #fbbf24; }
+            T { text: "No camera in the simulator. Paste what the QR carries; it runs the exact same checks as a scan."; color: Ink.soft; font-size: 14px; }
+            // Single-line TextInput: the SDK TextArea re-wraps on every keystroke, which stalls
+            // on ~1 KB of unbroken JSON.
+            Rectangle {
+                height: 64px;
+                border-radius: 18px;
+                border-width: 1px;
+                border-color: ta.has-focus ? Ink.ok : Ink.line;
+                background: #ffffff1f;
+                clip: true;
+                ta := TextInput {
+                    x: 16px;
+                    width: parent.width - 32px;
+                    single-line: true;
+                    color: Ink.ink;
+                    font-family: "Source Code Pro";
+                    font-size: 14px;
+                    vertical-alignment: center;
+                }
+                if ta.text == "": Text {
+                    x: 16px;
+                    text: "Tap here, then paste the payload";
+                    color: Ink.dim;
+                    font-family: Theme.font-primary;
+                    font-size: 15px;
+                    vertical-alignment: center;
+                }
+            }
+            T { text: ta.text.character-count + " characters"; color: Ink.dim; font-size: 13px; }
+            // Directly under the field so the on-screen keyboard never covers it.
+            Btn { text: "Verify payload"; solid: true; clicked => { root.submit-text(ta.text); ta.text = ""; } }
+            Rectangle { vertical-stretch: 1; }
+        }
+
+        if screen == "REVIEW": VerticalLayout {
+            spacing: 14px;
+            Pill {
+                text: req-trusted ? "Verified requester" : "Unknown requester";
+                dot: req-trusted ? Ink.ok : Ink.bad;
+            }
+            Text { text: req-name; color: Ink.ink; font-family: Theme.font-primary; font-size: 30px; font-weight: 600; wrap: word-wrap; letter-spacing: -0.5px; }
+            T { text: "Key " + req-key + "  ·  expires in " + req-expires-in + "s"; color: Ink.dim; font-size: 13px; }
+            if !req-trusted: Glass {
+                tint: #fb718533;
+                pad: 14px;
+                T { text: "This key is not in your trusted verifiers. The name above is self-claimed."; font-size: 14px; }
+            }
+            Glass {
+                tint: req-trusted ? #5eead41f : #00000000;
+                Eyebrow { text: "WILL BE SHARED"; }
+                Text { text: req-claim + " = " + req-value; color: Ink.ink; font-family: Theme.font-primary; font-size: 26px; font-weight: 600; }
+            }
+            Glass {
+                Eyebrow { text: "STAYS ON THIS PRIME"; }
+                T { text: req-kept; color: Ink.soft; }
+            }
+            Rectangle { vertical-stretch: 1; }
+            HorizontalLayout {
+                spacing: 12px;
+                Btn { text: "Deny"; clicked => { root.decide(false); } }
+                Btn { text: "Approve"; solid: true; accent: req-trusted ? Ink.ink : Ink.bad; clicked => { root.decide(true); } }
+            }
+        }
+
+        if screen == "TRUST": VerticalLayout {
+            spacing: 14px;
+            Pill { text: "Add trusted " + req-claim; dot: #fbbf24; }
+            Text { text: req-name; color: Ink.ink; font-family: Theme.font-primary; font-size: 30px; font-weight: 600; wrap: word-wrap; }
+            Glass {
+                Eyebrow { text: "PUBLIC KEY"; }
+                Mono { text: req-key; }
+            }
+            T { text: "Only approve if this key matches what the " + req-claim + " showed you in person. The name is self-claimed."; color: Ink.soft; font-size: 14px; }
+            Rectangle { vertical-stretch: 1; }
+            HorizontalLayout {
+                spacing: 12px;
+                Btn { text: "Cancel"; clicked => { root.decide(false); } }
+                Btn { text: "Trust"; solid: true; clicked => { root.decide(true); } }
+            }
+        }
+
+        if screen == "ANSWER": VerticalLayout {
+            spacing: 14px;
+            Pill { text: "Signed · nonce-bound"; }
+            Glass {
+                pad: 12px;
+                vertical-stretch: 1;
+                Rectangle {
+                    border-radius: 16px; background: #ffffff; clip: true;
+                    Image { width: parent.width - 12px; height: parent.height - 12px; source: answer-qr; image-fit: contain; }
+                }
+            }
+            T { text: "Show this to the verifier. It reveals one claim and only works for this request."; color: Ink.soft; font-size: 14px; }
+        }
+
+        if screen == "CREDS": VerticalLayout {
+            spacing: 12px;
+            Text { text: "Credentials"; color: Ink.ink; font-family: Theme.font-primary; font-size: 30px; font-weight: 500; }
+            Flickable {
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 12px;
+                    if credentials.length == 0: T { text: "None yet. Trust an issuer, show it your key QR, then load the credential it gives you."; color: Ink.soft; }
+                    for c in credentials: Glass { T { text: c; font-size: 14px; } }
+                }
+            }
+            Btn { text: "Erase all PrimeID data"; clicked => { root.screen = "WIPE"; } }
+        }
+
+        if screen == "RECEIPTS": VerticalLayout {
+            spacing: 12px;
+            Text { text: "Privacy receipts"; color: Ink.ink; font-family: Theme.font-primary; font-size: 30px; font-weight: 500; }
+            T { text: "Only you can see this log. Newest first."; color: Ink.dim; font-size: 13px; }
+            Flickable {
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 12px;
+                    if receipts.length == 0: T { text: "No requests answered or denied yet."; color: Ink.soft; }
+                    for r in receipts: Glass { T { text: r; font-size: 14px; } }
+                }
+            }
+        }
+
+        if screen == "WIPE": VerticalLayout {
+            spacing: 14px;
+            Pill { text: "Irreversible"; dot: Ink.bad; }
+            Text { text: "Erase everything?"; color: Ink.ink; font-family: Theme.font-primary; font-size: 32px; font-weight: 500; }
+            Glass {
+                tint: #fb71851f;
+                T { text: "Removes every credential, trusted issuer and verifier, revocation list and privacy receipt from this Prime."; color: Ink.soft; }
+            }
+            Rectangle { vertical-stretch: 1; }
+            HorizontalLayout {
+                spacing: 12px;
+                Btn { text: "Cancel"; clicked => { root.screen = "CREDS"; } }
+                Btn { text: "Erase"; solid: true; accent: Ink.bad; clicked => { root.wipe(); } }
+            }
+        }
+
+        if screen == "MESSAGE": VerticalLayout {
+            spacing: 16px;
+            Pill { text: msg-ok ? "Passed" : "Blocked"; dot: msg-ok ? Ink.ok : Ink.bad; }
+            Text { text: msg-title; color: Ink.ink; font-family: Theme.font-primary; font-size: 32px; font-weight: 500; wrap: word-wrap; letter-spacing: -0.5px; }
+            Glass {
+                tint: msg-ok ? #5eead41a : #fb71851f;
+                T { text: msg-body; color: Ink.soft; }
+            }
+            Rectangle { vertical-stretch: 1; }
+            Btn { text: "Done"; solid: true; clicked => { root.screen = "HOME"; } }
+        }
+
+        if screen == "FATAL": VerticalLayout {
+            spacing: 14px;
+            Pill { text: "Key unavailable"; dot: Ink.bad; }
+            T { text: fatal; }
+        }
+    }
+}

@@ -25,6 +25,8 @@ import {
 } from "@core-crypto/schemas";
 import { createRevocationList } from "@core-crypto/revocation";
 import { QrCodeDisplay } from "./QrCodeDisplay";
+import jsQR from "jsqr";
+import { loadOrCreateKey, saveKey, trustCard } from "../demoKeys";
 
 interface IssuerStudioProps {
   deviceHolderPubKey: string;
@@ -87,7 +89,7 @@ export const IssuerStudio: React.FC<IssuerStudioProps> = ({
   compact = false,
 }) => {
   // Deterministic or generated issuer keypair
-  const [issuerKeypair, setIssuerKeypair] = useState<KeyPair>(() => generateRandomKeyPair());
+  const [issuerKeypair, setIssuerKeypair] = useState<KeyPair>(() => loadOrCreateKey("primeid.issuer"));
   const [issuerName, setIssuerName] = useState<string>("Global Identity Authority");
   const [holderPubKeyInput, setHolderPubKeyInput] = useState<string>(deviceHolderPubKey);
   const [claimsList, setClaimsList] = useState<ClaimItem[]>(PRESET_TEMPLATES[0].claims);
@@ -224,7 +226,7 @@ export const IssuerStudio: React.FC<IssuerStudioProps> = ({
               </p>
             </div>
             <button
-              onClick={() => setIssuerKeypair(generateRandomKeyPair())}
+              onClick={() => setIssuerKeypair(saveKey("primeid.issuer", generateRandomKeyPair()))}
               className="py-1 px-3 bg-[#181F2C] hover:bg-[#222B3D] text-xs font-mono text-slate-300 rounded-xl border border-[#2D374A] flex items-center gap-1.5"
             >
               <Key className="w-3.5 h-3.5 text-amber-400" />
@@ -280,6 +282,30 @@ export const IssuerStudio: React.FC<IssuerStudioProps> = ({
               placeholder="02... or 03... (33-byte compressed secp256k1 public key)"
               className="w-full py-2 px-3 bg-[#080A0E] border border-[#232B3B] rounded-xl text-xs font-mono text-amber-300 font-semibold focus:outline-none focus:border-amber-400"
             />
+            <label className="mt-2 inline-block py-1.5 px-3 bg-[#181F2C] hover:bg-[#222B3D] text-xs font-mono text-amber-300 rounded-xl border border-[#2D374A] cursor-pointer">
+              Read Prime key QR from screenshot
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  const bmp = await createImageBitmap(file);
+                  const canvas = document.createElement("canvas");
+                  canvas.width = bmp.width;
+                  canvas.height = bmp.height;
+                  const ctx = canvas.getContext("2d")!;
+                  ctx.drawImage(bmp, 0, 0);
+                  const img = ctx.getImageData(0, 0, bmp.width, bmp.height);
+                  const code = jsQR(img.data, img.width, img.height);
+                  if (!code) return alert("No QR code found in that image.");
+                  if (!/^0[23][0-9a-f]{64}$/i.test(code.data.trim())) return alert("That QR is not a Prime holder key.");
+                  setHolderPubKeyInput(code.data.trim());
+                }}
+              />
+            </label>
             <p className="text-[10px] text-slate-500 mt-1 font-mono">
               Crucial: The issuer signs this key into the credential so screenshots cannot be used by
               anyone else.
@@ -408,6 +434,12 @@ export const IssuerStudio: React.FC<IssuerStudioProps> = ({
 
       {/* Right Column: Credential Issuance Package QR & Cryptographic Inspector */}
       <div className={compact ? "space-y-4 w-full" : "lg:col-span-5 space-y-6"}>
+        <QrCodeDisplay
+          data={trustCard(issuerName, issuerKeypair.publicKeyHex, "issuer")}
+          title="Step 0: Issuer Trust Card"
+          subtitle="Scan once on Passport Prime and approve, so Prime accepts credentials signed by this key"
+          size={200}
+        />
         {issuedPackage ? (
           <div className="space-y-4">
             <QrCodeDisplay

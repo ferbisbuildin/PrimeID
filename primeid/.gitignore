@@ -1,0 +1,8 @@
+target/
+.foundation-sdk/
+ui/ui
+manifest.toml
+.claude/
+.agents/
+.mcp.json
+AGENTS.md

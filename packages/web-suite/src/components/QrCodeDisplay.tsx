@@ -25,7 +25,7 @@ export const QrCodeDisplay: React.FC<QrCodeDisplayProps> = ({
   const [copied, setCopied] = useState<boolean>(false);
   const [showRaw, setShowRaw] = useState<boolean>(false);
 
-  const serializedData = typeof data === "string" ? data : JSON.stringify(data, null, 2);
+  const serializedData = typeof data === "string" ? data : JSON.stringify(data);
 
   useEffect(() => {
     QRCode.toString(

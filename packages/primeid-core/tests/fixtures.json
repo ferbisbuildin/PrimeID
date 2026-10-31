@@ -1,0 +1,140 @@
+{
+ "holder_pub": "03977820425dbc559c68d5be43a7b85ee1085c318ed8af7871af2a3d283db0dca8",
+ "valid": {
+  "credential": {
+   "credential_id": "cred-1",
+   "issuer_name": "Demo Issuer",
+   "issuer": "03cbf28accdade345343236c538b820ab48fdc9987586010fac3afb64dc7bdb4fe",
+   "holder": "03977820425dbc559c68d5be43a7b85ee1085c318ed8af7871af2a3d283db0dca8",
+   "issued_at": 1700000000,
+   "expires": 4102444800,
+   "claims": [
+    "9be854b2a58d9d46b21b6c87b3ca57b12f75979eddd823d3c0bd66a047c9190a",
+    "65d3cee3b3a6a94d69194ad12266f1566dd96e9279b12e4b51c81f6ee5fcb500",
+    "4302534c96493a26d5bdded4884480fbd4d25da7d4a67207a47236c8188b194b"
+   ],
+   "signature": "f1c2ce27b774e5b7f3505012309f240788e949203cdcdc4c9c0164d341fcf7c0689cccaf8d6c813b31a945849e9a9188b4fa81063e13e828ade815bf759d27aa"
+  },
+  "disclosures": [
+   {
+    "key": "over_18",
+    "value": "true",
+    "salt": "2bc990059473448e6ebd442aa16bfaa0567ac03dd094876bdb1fd834abe42c1e"
+   },
+   {
+    "key": "country",
+    "value": "IN",
+    "salt": "dc90cf07de907ccc64636ceddb38e552a1a0d984743b1f36a447b73877012c39"
+   },
+   {
+    "key": "name",
+    "value": "Asha Rao",
+    "salt": "dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf"
+   }
+  ]
+ },
+ "forged": {
+  "credential": {
+   "credential_id": "cred-1",
+   "issuer_name": "Demo Issuer",
+   "issuer": "03cbf28accdade345343236c538b820ab48fdc9987586010fac3afb64dc7bdb4fe",
+   "holder": "03977820425dbc559c68d5be43a7b85ee1085c318ed8af7871af2a3d283db0dca8",
+   "issued_at": 1700000000,
+   "expires": 4102444800,
+   "claims": [
+    "9be854b2a58d9d46b21b6c87b3ca57b12f75979eddd823d3c0bd66a047c9190a",
+    "65d3cee3b3a6a94d69194ad12266f1566dd96e9279b12e4b51c81f6ee5fcb500",
+    "4302534c96493a26d5bdded4884480fbd4d25da7d4a67207a47236c8188b194b"
+   ],
+   "signature": "3a22a357399e50693b54610862e5bd95b50a8829795b9b0639b3c7f170235bc915e774b991ca777ac97eaec012ace5bf4183dcf8d53d9033fd3e1127fbeb9a93"
+  },
+  "disclosures": [
+   {
+    "key": "over_18",
+    "value": "true",
+    "salt": "2bc990059473448e6ebd442aa16bfaa0567ac03dd094876bdb1fd834abe42c1e"
+   },
+   {
+    "key": "country",
+    "value": "IN",
+    "salt": "dc90cf07de907ccc64636ceddb38e552a1a0d984743b1f36a447b73877012c39"
+   },
+   {
+    "key": "name",
+    "value": "Asha Rao",
+    "salt": "dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf"
+   }
+  ]
+ },
+ "other_holder": {
+  "credential": {
+   "credential_id": "cred-1",
+   "issuer_name": "Demo Issuer",
+   "issuer": "03cbf28accdade345343236c538b820ab48fdc9987586010fac3afb64dc7bdb4fe",
+   "holder": "03b36311a9e4a10d48c1188d9254db2a1c8d13d7d2e75b609b7e50758418f262f6",
+   "issued_at": 1700000000,
+   "expires": 4102444800,
+   "claims": [
+    "9be854b2a58d9d46b21b6c87b3ca57b12f75979eddd823d3c0bd66a047c9190a",
+    "65d3cee3b3a6a94d69194ad12266f1566dd96e9279b12e4b51c81f6ee5fcb500",
+    "4302534c96493a26d5bdded4884480fbd4d25da7d4a67207a47236c8188b194b"
+   ],
+   "signature": "378c99d8dc4af48b383e55cfc83c870ccf51511f7e25f3073a3c9b06758c81864014ded99a5edb3ca92ff2c41775e6dd4ecf2bc84c1e66d4faf9183ae9894d40"
+  },
+  "disclosures": [
+   {
+    "key": "over_18",
+    "value": "true",
+    "salt": "2bc990059473448e6ebd442aa16bfaa0567ac03dd094876bdb1fd834abe42c1e"
+   },
+   {
+    "key": "country",
+    "value": "IN",
+    "salt": "dc90cf07de907ccc64636ceddb38e552a1a0d984743b1f36a447b73877012c39"
+   },
+   {
+    "key": "name",
+    "value": "Asha Rao",
+    "salt": "dbc4579ae2b3ab293213f42bb852706ea995c3b5c3987f8aa9faae5004acb3cf"
+   }
+  ]
+ },
+ "request": {
+  "request_id": "req-1",
+  "verifier_name": "Demo Verifier",
+  "verifier_pubKey": "03cf73dd4c8f6240b922c6cfa83cf2741718df990dfb78ec81bf5d300868376225",
+  "requested_claim": "over_18",
+  "nonce": "0xabcdef0123456789",
+  "expires": 4102444800,
+  "signature": "15bff6fd6053e8bad0cd4723d43fbbc44840bae470decd0b0c237d26f860a795394cf7b3c7c92ef983b906f10c00c32a505aea4d470f06f097c01f6f565d647d"
+ },
+ "tampered_request": {
+  "request_id": "req-1",
+  "verifier_name": "Demo Verifier",
+  "verifier_pubKey": "03cf73dd4c8f6240b922c6cfa83cf2741718df990dfb78ec81bf5d300868376225",
+  "requested_claim": "name",
+  "nonce": "0xabcdef0123456789",
+  "expires": 4102444800,
+  "signature": "15bff6fd6053e8bad0cd4723d43fbbc44840bae470decd0b0c237d26f860a795394cf7b3c7c92ef983b906f10c00c32a505aea4d470f06f097c01f6f565d647d"
+ },
+ "revocation": {
+  "primeid_revocation": {
+   "issuer": "03cbf28accdade345343236c538b820ab48fdc9987586010fac3afb64dc7bdb4fe",
+   "revoked": [
+    "cred-1"
+   ],
+   "published_at": 1700000100
+  },
+  "signature": "e81ce5d948d071cc6680e902c3f1a7e153486332d9d918347040510e4cc901460affdcb0be21c15172c756e17ec00b511804cfa2f6b2fd943cbdb5bd6c26c86d"
+ },
+ "revocation_forged": {
+  "primeid_revocation": {
+   "issuer": "03cbf28accdade345343236c538b820ab48fdc9987586010fac3afb64dc7bdb4fe",
+   "revoked": [
+    "cred-1"
+   ],
+   "published_at": 1700000100
+  },
+  "signature": "765d1bd31ca1940164b26f25488cdcc2874786c4c7c732e49abc5c7d24303f8051ab0a76ccf6d819599fe342af9404559d5fdf9a3b79a9212c96c7334ed05e3d"
+ }
+}

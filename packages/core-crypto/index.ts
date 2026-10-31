@@ -7,3 +7,4 @@ export * from "./pipeline";
 export * from "./revocation";
 export * from "./attacks";
 export * from "./icao-passport";
+export * from "./zksync-anchor";

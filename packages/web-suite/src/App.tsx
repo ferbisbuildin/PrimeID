@@ -20,7 +20,7 @@ export const App: React.FC = () => {
   const store = useMemo(() => new KeyOsStore(), []);
   const engine = useMemo(() => new HardwareEngine(store), [store]);
 
-  const [currentMode, setCurrentMode] = useState<ViewMode>("ECOSYSTEM");
+  const [currentMode, setCurrentMode] = useState<ViewMode>("ISSUER");
   const [demoMode, setDemoMode] = useState<"GUIDED" | "GRID">("GUIDED");
   const [activeDemoStep, setActiveDemoStep] = useState<1 | 2 | 3 | 4>(1);
 
@@ -370,7 +370,7 @@ export const App: React.FC = () => {
         {/* =================================================================== */}
         {currentMode === "ISSUER" && (
           <IssuerStudio
-            deviceHolderPubKey={holderPubKey}
+            deviceHolderPubKey=""
             onBeamCredentialToDevice={handleBeamCredentialToDevice}
             onPublishRevocationList={setActiveCrl}
           />

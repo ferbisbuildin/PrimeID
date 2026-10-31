@@ -42,3 +42,13 @@ Thumbs.db
 # Temporary / Scratch files
 scratch/
 tmp/
+
+# PrimeID demo issuer/verifier keys and payloads
+.primeid-demo/
+
+# PrimeID demo issuer/verifier keys and payloads
+.primeid-demo/
+.claude-flow/
+.swarm/
+
+[OK] Command outcome recorded

@@ -24,7 +24,10 @@ import {
   RevocationList,
 } from "@core-crypto/schemas";
 import { executeVerificationPipeline } from "@core-crypto/pipeline";
+import { computeZkCommitment, verifyZkSyncAnchor } from "@core-crypto/zksync-anchor";
 import { QrCodeDisplay } from "./QrCodeDisplay";
+import { loadOrCreateKey, trustCard } from "../demoKeys";
+import jsQR from "jsqr";
 
 interface VerifierTerminalProps {
   onBeamRequestToDevice?: (req: VerifierRequest) => void;
@@ -73,7 +76,7 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
   compact = false,
 }) => {
   // Verifier Identity
-  const [verifierKeypair] = useState<KeyPair>(() => generateRandomKeyPair());
+  const [verifierKeypair] = useState<KeyPair>(() => loadOrCreateKey("primeid.verifier"));
   const [verifierName, setVerifierName] = useState<string>("Apex Exchange Compliance Terminal");
   const [requestedClaim, setRequestedClaim] = useState<string>("over_18");
   const [expiryMinutes, setExpiryMinutes] = useState<number>(5);
@@ -113,8 +116,12 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
     setPipelineResult(null);
   };
 
-  // Run 4-Step Verification Pipeline on an Answer
-  const handleVerifyAnswer = (answerObj: SignedAnswer) => {
+  // ZKsync Era On-Chain Anchor State
+  const [zkSyncVerification, setZkSyncVerification] = useState<any>(null);
+  const [isCheckingZkSync, setIsCheckingZkSync] = useState<boolean>(false);
+
+  // Run 4-Step Verification Pipeline on an Answer + ZKsync On-Chain Anchor Verification
+  const handleVerifyAnswer = async (answerObj: SignedAnswer) => {
     const result = executeVerificationPipeline(answerObj, {
       expectedNonce: activeRequest?.nonce,
       expectedVerifierPubKey: activeRequest?.verifier_pubKey,
@@ -123,7 +130,23 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
 
     setPipelineResult(result);
 
-    if (result.isValid) {
+    // If local 4-step pipeline passes, verify on-chain ZKsync Era L2 anchor state
+    if (result.isValid && answerObj.credential) {
+      setIsCheckingZkSync(true);
+      try {
+        const commitment = computeZkCommitment(
+          answerObj.credential.credential_id,
+          answerObj.credential.issuer,
+          answerObj.credential.claims
+        );
+        const zkResult = await verifyZkSyncAnchor(commitment);
+        setZkSyncVerification(zkResult);
+      } catch (e) {
+        console.error("ZKsync check error:", e);
+      } finally {
+        setIsCheckingZkSync(false);
+      }
+
       confetti({
         particleCount: 80,
         spread: 60,
@@ -253,6 +276,13 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
           </button>
         </div>
 
+        <QrCodeDisplay
+          data={trustCard(verifierName, verifierKeypair.publicKeyHex, "verifier")}
+          title="Verifier Trust Card"
+          subtitle="Scan on Passport Prime and approve once; afterwards this verifier's requests show as VERIFIED"
+          size={180}
+        />
+
         {/* Display Step 3 Request QR */}
         {activeRequest && (
           <QrCodeDisplay
@@ -305,6 +335,34 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
             >
               Verify Pasted Answer Payload
             </button>
+            <label className="block w-full mt-2 py-2 text-center bg-[#181F2C] hover:bg-[#222B3D] text-emerald-400 font-mono font-bold text-xs rounded-xl border border-[#2B3547] cursor-pointer">
+              Read Answer QR from Screenshot
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  e.target.value = "";
+                  if (!file) return;
+                  const bmp = await createImageBitmap(file);
+                  const canvas = document.createElement("canvas");
+                  canvas.width = bmp.width;
+                  canvas.height = bmp.height;
+                  const ctx = canvas.getContext("2d")!;
+                  ctx.drawImage(bmp, 0, 0);
+                  const img = ctx.getImageData(0, 0, bmp.width, bmp.height);
+                  const code = jsQR(img.data, img.width, img.height);
+                  if (!code) return alert("No QR code found in that image.");
+                  setAnswerInputText(code.data);
+                  try {
+                    handleVerifyAnswer(JSON.parse(code.data));
+                  } catch {
+                    alert("QR found, but it is not a PrimeID answer.");
+                  }
+                }}
+              />
+            </label>
           </div>
 
           {/* 4-Step Pipeline Result Card */}
@@ -381,6 +439,50 @@ export const VerifierTerminal: React.FC<VerifierTerminalProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* ZKsync Era L2 On-Chain Anchor Verification Card */}
+              <div className="p-4 bg-[#080B10] border border-[#1A2536] rounded-2xl space-y-2 font-mono">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span className="text-xs font-bold text-blue-400">
+                      ZKSYNC ERA L2 STATE ANCHOR
+                    </span>
+                  </div>
+                  {isCheckingZkSync ? (
+                    <span className="text-[10px] text-amber-300">Querying ZKsync RPC...</span>
+                  ) : zkSyncVerification?.isAnchorValid ? (
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
+                      ANCHORED ON-CHAIN
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-slate-500">STANDALONE</span>
+                  )}
+                </div>
+
+                {zkSyncVerification && (
+                  <div className="text-[11px] space-y-1 text-slate-400 pt-1">
+                    <div>
+                      <span className="text-slate-500">Network: </span>
+                      <span className="text-slate-200">{zkSyncVerification.network} (Chain ID: {zkSyncVerification.chainId})</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">ZKsync L2 Block: </span>
+                      <span className="text-emerald-400">#{zkSyncVerification.latestBlock}</span>
+                      <span className="text-slate-500 text-[10px] ml-2">({zkSyncVerification.gasPriceGwei} Gwei)</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500">Commitment Hash: </span>
+                      <div className="text-[#D4AF37] text-[10px] break-all bg-black/40 p-1.5 rounded mt-0.5">
+                        {zkSyncVerification.commitmentHash}
+                      </div>
+                    </div>
+                    <div className="text-[10px] text-slate-400 pt-1">
+                      {zkSyncVerification.message}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (

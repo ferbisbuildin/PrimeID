@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 Foundation Devices, Inc. <hello@foundation.xyz>
+# SPDX-License-Identifier: MIT
+
+# Foundation application configuration
+app-name = "primeid"
+friendly-app-name = "PrimeID"
+launcher-app-name = "PrimeID"
+description = "Prove the fact, keep the document"
+icon = "resources/icon.png"
+theme = "resources/theme.json"
+app-id = "0xa9327f09d764e318c7a034016fb0b374"
+min-keyos-version = "1.0.0"
+
+[publisher]
+name = "Vardan Agarwal"
+contact-email = "pushpendra@techeve.in"
+support-url = "https://github.com/vardanagarwal11"
+
+[permissions]
+template = ["gui-app", "fs-generic"]
+"os/security" = ["GetAppSeed"]
