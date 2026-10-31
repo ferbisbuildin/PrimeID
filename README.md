@@ -48,6 +48,8 @@ list. The other claims stay as opaque hashes.
 
 ## Screenshots (real app in the KeyOS simulator)
 
+Demo video: [docs/PrimeID-demo.mp4](docs/PrimeID-demo.mp4)
+
 | Holder key QR | Credential stored | Request review | Signed answer |
 |---|---|---|---|
 | ![key](docs/screenshots/01-key.png) | ![credential](docs/screenshots/02-credential.png) | ![review](docs/screenshots/03-review.png) | ![answer](docs/screenshots/04-answer.png) |
@@ -135,8 +137,6 @@ try to get its own trust card accepted first, which is why adding one needs an e
 authority (for example a government or industry registry) that signs their keys, and Prime would ship
 with that authority's root key instead of relying on hand-added cards.
 
-> The screenshots were captured before the badge was renamed. They show the old wording, *Verified requester*
-> and *Unknown requester*, for the same check.
 
 ## Test status (honest)
 
@@ -149,8 +149,7 @@ copied and fake-bank attacks, revocation, receipts, persistence across restart, 
 - Scanning through a real camera: the simulator has no webcam inside WSL, so payloads are typed in through
   **Enter payload**, which runs exactly the same checks.
 
-**Known simulator limit:** typing very long payloads quickly can overflow the simulator's GUI queue, so the
-scripts type slowly in 32-character chunks. This doesn't apply to the camera path or to hardware.
+**Simulator note:** the *Enter payload* field moves text into a buffer every 160 characters, because the simulator GUI deadlocked when it had to lay out about 1 KB of text in one field.
 
 **Not built (roadmap):** e-passport NFC import, x401 web requests, unlinkable batch or BBS+ credentials, ZK proofs,
 and zkSync anchoring. Today the issuer signature and bound key repeat across verifiers, so the

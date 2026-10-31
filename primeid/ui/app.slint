@@ -141,6 +141,9 @@ export component AppWindow inherits Window {
 
     callback scan();
     callback submit-text(string);
+    // Payload typed so far, moved out of the field every 160 chars: the sim GUI deadlocks
+    // laying out ~1 KB in one TextInput.
+    in-out property <string> pending;
     callback decide(bool);
     callback wipe();
 
@@ -212,7 +215,7 @@ export component AppWindow inherits Window {
             HorizontalLayout {
                 spacing: 12px;
                 Btn { text: "My key QR"; clicked => { root.screen = "KEY"; } }
-                Btn { text: "Enter payload"; clicked => { root.screen = "ENTER"; } }
+                Btn { text: "Enter payload"; clicked => { root.pending = ""; root.screen = "ENTER"; } }
             }
         }
 
@@ -259,8 +262,14 @@ export component AppWindow inherits Window {
                     font-family: "Source Code Pro";
                     font-size: 14px;
                     vertical-alignment: center;
+                    edited => {
+                        if self.text.character-count >= 160 {
+                            root.pending += self.text;
+                            self.text = "";
+                        }
+                    }
                 }
-                if ta.text == "": Text {
+                if ta.text == "" && root.pending == "": Text {
                     x: 16px;
                     text: "Tap here, then paste the payload";
                     color: Ink.dim;
@@ -269,9 +278,9 @@ export component AppWindow inherits Window {
                     vertical-alignment: center;
                 }
             }
-            T { text: ta.text.character-count + " characters"; color: Ink.dim; font-size: 13px; }
+            T { text: (root.pending.character-count + ta.text.character-count) + " characters"; color: Ink.dim; font-size: 13px; }
             // Directly under the field so the on-screen keyboard never covers it.
-            Btn { text: "Verify payload"; solid: true; clicked => { root.submit-text(ta.text); ta.text = ""; } }
+            Btn { text: "Verify payload"; solid: true; clicked => { root.submit-text(root.pending + ta.text); root.pending = ""; ta.text = ""; } }
             Rectangle { vertical-stretch: 1; }
         }
 
