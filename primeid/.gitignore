@@ -6,3 +6,7 @@ manifest.toml
 .agents/
 .mcp.json
 AGENTS.md
+.claude/
+.agents/
+.mcp.json
+AGENTS.md
